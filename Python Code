@@ -1,0 +1,43 @@
+import serial
+import time
+import matplotlib.pyplot as plt
+
+# Initialize serial connection
+arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=9600, timeout=1)
+
+def read_temperature():
+    """Read temperature data from Arduino."""
+    try:
+        arduino.write(b'R')  # Send a read signal if needed
+        data = arduino.readline().decode('utf-8').strip()
+        return float(data)
+    except ValueError:
+        return None
+
+def plot_temperature():
+    """Plot temperature data in real-time."""
+    plt.ion()
+    fig, ax = plt.subplots()
+    temps = []
+    times = []
+    start_time = time.time()
+
+    while True:
+        temp = read_temperature()
+        if temp is not None:
+            current_time = time.time() - start_time
+            temps.append(temp)
+            times.append(current_time)
+            ax.clear()
+            ax.plot(times, temps, label='Temperature (°C)')
+            ax.set_title("Real-Time Temperature Monitoring")
+            ax.set_xlabel("Time (s)")
+            ax.set_ylabel("Temperature (°C)")
+            ax.legend()
+            plt.pause(1)  # Update every second
+
+try:
+    plot_temperature()
+except KeyboardInterrupt:
+    print("Exiting program...")
+    arduino.close()
