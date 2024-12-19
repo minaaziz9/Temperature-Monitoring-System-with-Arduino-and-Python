@@ -1,0 +1,22 @@
+#include <DHT.h>
+
+#define DHTPIN 2     // Pin where the DHT sensor is connected
+#define DHTTYPE DHT11 // DHT 11 sensor type
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+}
+
+void loop() {
+  delay(2000); // Delay 2 seconds between readings
+  
+  float temp = dht.readTemperature();
+  if (isnan(temp)) {
+    Serial.println("Error reading temperature!");
+    return;
+  }
+  Serial.println(temp); // Send temperature data via Serial
+}
